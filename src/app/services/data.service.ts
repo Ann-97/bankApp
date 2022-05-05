@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class DataService {
 
+ currentUser:any
+
   database:any ={
     1000:{acno:1000,uname:"Neer",password:1000,balance:5000},
     1001:{acno:1001,uname:"Niha",password:1001,balance:3000},
@@ -34,6 +36,95 @@ export class DataService {
     }
    
   }
+//login
+login(acno:any,pswd:any){
+  //user entered acno and pswd
+
+   let database=this.database
+
+  if(acno in database){
+    if(pswd == database[acno]["password"]){
+      this.currentUser=database[acno]["uname"]
+      //already exist in db
+      return true
+    }
+    else{
+     alert("Incorrect password")
+     return false
+  
+  }
+ 
+  }
+ 
+  else{
+   alert("user doesnot exist")
+   return false
+  }
+ }
+
+ //deposit
+deposit(acno:any,pswd:any,amt:any){
+  var amount= parseInt(amt)
+  let database= this.database
+  
+  
+
+  if(acno in database){
+    if(pswd ==database[acno]["password"]){
+      database[acno]["balance"] +=amount
+      return database[acno]["balance"]
+
+    }
+    else{
+      alert("Incorrect password")
+      return false
+    }
+
+  }
+  else{
+    alert("user doesnot exist")
+    return false
+  }
+}
+
+//withdraw
+withdraw(acno:any,pswd:any,amt:any){
+  var amount= parseInt(amt)
+  let database= this.database
+  
+  
+
+  if(acno in database){
+    if(pswd ==database[acno]["password"]){
+
+      if(database[acno]["balance"]>amount){
+        database[acno]["balance"] -=amount
+        return database[acno]["balance"]
+
+      }
+      else{
+        alert("Insufficient balance")
+        return false
+      }
+     
+      database[acno]["balance"] +=amount
+      return database[acno]["balance"]
+
+    }
+    else{
+      alert("Incorrect password")
+      return false
+    }
+
+  }
+  else{
+    alert("user doesnot exist")
+    return false
+  }
+}
+
+
 
 
 }
+

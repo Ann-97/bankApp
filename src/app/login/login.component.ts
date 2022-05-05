@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DataService } from '../services/data.service';
 
@@ -11,65 +12,44 @@ export class LoginComponent implements OnInit {
 
   aim="Your perfect banking partner"
   accnum="Account number please!!"
-  acno=""
-  pswd=""
+  
 
+
+  //register form model 
+  loginForm= this.fb.group({
+    acno:['',[Validators.required,Validators.pattern('[0-9]*')]],
+    pswd:['',[Validators.required,Validators.pattern('[a-zA-Z0-9]*')]]
+  })
  
-  constructor(private router:Router,private ds:DataService) { }
+  constructor(private router:Router,private ds:DataService,private fb:FormBuilder) { }
 
   ngOnInit(): void {
   }
-  acnoChange(event:any){
-    this.acno=event.target.value
+  //acnoChange(event:any){
+   // this.acno=event.target.value
     
-  }
+  //}
 
-  pswdChange(event:any){
-    this.pswd=event.target.value
-  }
+  //pswdChange(event:any){
+   // this.pswd=event.target.value
+  //}
 
   login(){
-   var acno=this.acno;
-   var pswd=this.pswd;
+   var acno=this.loginForm.value.acno;
+   var pswd=this.loginForm.value.pswd;
+   //call login in dataservice
 
-    let database=this.ds.database
+   if(this.loginForm.valid){
+   const result= this.ds.login(acno,pswd)
+   if (result){
+    alert("login successfull")
+    this.router.navigateByUrl("dashboard")
 
-   if(acno in database){
-     if(pswd == database[acno]["password"]){
-       alert("login successfull")
-       this.router.navigateByUrl("dashboard")
-     }
-     else{
-      alert("Incorrect password")
    }
-  
-   }
-  
-   else{
-    alert("user doesnot exist")
-   }
+  }
+  else{
+    alert("invalid form")
   }
 }
 
-//login using template referencing variable
-//login(a:any,p:any){
- // var acno= a.value
- // var pswd= p.value
-
-  // let database=this.database
-
-  //if(acno in database){
-  //  if(pswd == database[acno]["password"]){
-  //    alert("login successfull")
-  //  }
-//else{
- //    alert("Incorrect password")
- // }
- 
- // }
- 
- // else{
- ///  alert("user doesnot exist")
- // }
-// }
-//}
+}
