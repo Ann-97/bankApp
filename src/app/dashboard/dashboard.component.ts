@@ -11,6 +11,7 @@ import { DataService } from '../services/data.service';
 export class DashboardComponent implements OnInit {
 
   user:any
+  acno:any
 
    //deposit form model 
   depositForm= this.fb.group({
@@ -26,15 +27,18 @@ export class DashboardComponent implements OnInit {
     pswd:['',[Validators.required,Validators.pattern('[a-zA-Z0-9]*')]]
   })
   
+
+  loginDate:any
   constructor(private ds:DataService,private fb:FormBuilder, private router:Router) { 
-  this.user=this.ds.currentUser
+  this.user=JSON.parse(localStorage.getItem('currentUser')||'')
+  this.loginDate= new Date()
   }
 
   ngOnInit(): void {
-    if(!localStorage.getItem("currentAcno")){
-      alert("please login")
-      this.router.navigateByUrl("")
-    }
+    // if(!localStorage.getItem("currentAcno")){
+    //   alert("please login")
+    //   this.router.navigateByUrl("")
+    // }
   }
 
   deposit(){
@@ -43,11 +47,20 @@ export class DashboardComponent implements OnInit {
     var amount= this.depositForm.value.amount
 
     if(this.depositForm.valid){
-      const result=this.ds.deposit(acno,pswd,amount)
-      if(result){
-        alert(amount + " successfully deposited and new balance is : "+ result)
+      this.ds.deposit(acno,pswd,amount)
+      .subscribe((result:any)=>{
+        if(result){
+          alert(result.message)
+        }
+      },
+      (result)=>{
+        alert(result.error.message);
+    
       }
-    }
+      
+        )
+      }
+     
 
   else{
     alert("invalid form")
@@ -59,14 +72,29 @@ export class DashboardComponent implements OnInit {
     var amount= this.withdrawForm.value.amount
 
     if(this.withdrawForm.valid){
-      const result=this.ds.withdraw(acno,pswd,amount)
-    if(result){
-      alert(amount + " successfully debited and new balance is : "+ result)
-    } 
+      this.ds.withdraw(acno,pswd,amount)
+      if(this.depositForm.valid){
+        this.ds.withdraw(acno,pswd,amount)
+        .subscribe((result:any)=>{
+          if(result){
+            alert(result.message)
+          }
+        },
+        (result)=>{
+          alert(result.error.message);
+      
+        }
+        )
     }
     else{
       alert("invalid form")
     }
+  }
+  }
+  //delete from parent
+  deletefromParent(){
+    this.acno=JSON.parse(localStorage.getItem("currentAcno")||'')
+
   }
               // logout()
               logout(){
@@ -74,5 +102,27 @@ export class DashboardComponent implements OnInit {
                 localStorage.removeItem("currentAcno")
                 this.router.navigateByUrl("")
               }
+   //onCancel
+   onCancel(){
+     this.acno=""
+   }
 
-}
+   //ondelete
+   onDelete(event:any){
+    
+      this.ds.onDelete(event)
+     
+        .subscribe((result:any)=>{
+          if(result){
+            alert(result.message)
+            this.router.navigateByUrl("")
+          }
+        },
+        (result)=>{
+          alert(result.error.message);
+      
+        }
+        )
+    }
+   }
+
